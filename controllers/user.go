@@ -48,6 +48,16 @@ func CreateUser(client *database.Database) gin.HandlerFunc {
 			return
 		}
 
-		loggers.HandleResponse(ctx, http.StatusCreated, "User created successfully")
+		tokenString, err := auth.GenerateJWTToken(requestBody.Email)
+
+		if err != nil {
+			fmt.Println(err)
+			loggers.HandleResponse(ctx, http.StatusInternalServerError, err)
+			return
+		}
+
+		loggers.HandleResponse(ctx, http.StatusCreated, gin.H{
+			"token": tokenString,
+		})
 	}
 }

@@ -17,8 +17,9 @@ type CreateUserRequestBody struct {
 }
 
 type UserSchema struct {
-	ID    bson.ObjectID `bson:"_id" json:"id"`
-	Email string        `json:"email" bson:"email"`
-	Role  Roles         `json:"role" bson:"role"`
-	Name  string        `json:"name" bson:"name"`
+	ID       bson.ObjectID `bson:"_id" json:"id"`
+	Email    string        `json:"email" bson:"email"`
+	Role     Roles         `json:"role" bson:"role"`
+	Name     string        `json:"name" bson:"name"`
+	Password string        `json:"password" bson:"password"`
 }

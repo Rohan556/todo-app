@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/rohan/go-todo/database"
 	"github.com/rohan/go-todo/internal/helper"
@@ -27,8 +25,6 @@ func CreateUser(ctx *gin.Context, client *database.Database, document schema.Cre
 
 func GetUserInfo(ctx *gin.Context, client *database.Database, email string) (schema.UserSchema, error) {
 	collection := helper.ConnectToMongoDBCollection(client, Databasename, UserCollectionName)
-
-	fmt.Println(email, "email")
 
 	var User schema.UserSchema
 
