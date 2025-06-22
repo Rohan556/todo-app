@@ -1,7 +1,14 @@
 package schema
 
+import "go.mongodb.org/mongo-driver/v2/bson"
+
+type CreateToDoRequestBody struct {
+	Completed bool   `bson:"completed" json:"completed"`
+	Title     string `bson:"title" json:"title" validate:"required"`
+}
+
 type Todo struct {
-	Id        int    `json:"id"`
-	Completed bool   `json:"completed"`
-	Title     string `json:"title"`
+	ID        bson.ObjectID `bson:"_id" json:"id"`
+	Completed bool          `bson:"completed" json:"completed"`
+	Title     string        `bson:"title" json:"title"`
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -8,7 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rohan/go-todo/controllers"
+	"github.com/rohan/go-todo/database"
 )
+
+type Book struct {
+	Title  string
+	Author string
+}
 
 func main() {
 	fmt.Println("Loading env variables...")
@@ -21,9 +28,26 @@ func main() {
 	PORT := os.Getenv("PORT")
 
 	fmt.Println("Env variables loaded successfully")
+
+	MONGO_URI := os.Getenv("MONGO_URI")
+
+	databaseClient := database.ConnectToMongoDB(MONGO_URI)
+
+	defer func() {
+		if err = databaseClient.Client.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
+
+	if databaseClient.Client == nil {
+		log.Fatal("Failed to connect to MongoDB")
+	}
+
 	fmt.Println("Starting the server...")
 	server := gin.Default()
-	server.GET("/", controllers.GetAllTodos())
+
+	server.GET("/todo", controllers.GetAllTodos(&databaseClient))
+	server.POST("/todo", controllers.AddTodo(&databaseClient))
 
 	server.Run(":" + PORT)
 }
