@@ -48,6 +48,7 @@ func main() {
 
 	server.GET("/todo", controllers.GetAllTodos(&databaseClient))
 	server.POST("/todo", controllers.AddTodo(&databaseClient))
+	server.POST("/user", controllers.CreateUser(&databaseClient))
 
 	server.Run(":" + PORT)
 }
