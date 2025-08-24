@@ -10,13 +10,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rohan/go-todo/controllers"
 	"github.com/rohan/go-todo/database"
+	"github.com/rohan/go-todo/internal/middlewares"
 	"github.com/rohan/go-todo/internal/routes"
 )
-
-type Book struct {
-	Title  string
-	Author string
-}
 
 func main() {
 	fmt.Println("Loading env variables...")
@@ -47,10 +43,16 @@ func main() {
 	fmt.Println("Starting the server...")
 	server := gin.Default()
 
-	server.GET(routes.TODO_URL, controllers.GetAllTodos(&databaseClient))
-	server.POST(routes.TODO_URL, controllers.AddTodo(&databaseClient))
 	server.POST(routes.USER_URL, controllers.CreateUser(&databaseClient))
 	server.POST(routes.LOGIN_URL, controllers.LoginUser(&databaseClient))
+
+	protected := server.Group("/")
+	protected.Use(middlewares.JWTAuthMiddlewares())
+	{
+		protected.GET(routes.TODO_URL, controllers.GetAllTodos(&databaseClient))
+		protected.POST(routes.TODO_URL, controllers.AddTodo(&databaseClient))
+		protected.DELETE(routes.TODO_URL, controllers.DeleteTodo(&databaseClient))
+	}
 
 	server.Run(":" + PORT)
 }

@@ -35,16 +35,19 @@ func LoginUser(client *database.Database) gin.HandlerFunc {
 		}
 
 		if err == nil {
-			tokenString, err := auth.GenerateJWTToken(user.Email)
+			payload := schema.JWTRequiredFields{
+				Email:  user.Email,
+				UserId: user.ID.Hex(),
+			}
+
+			tokenString, err := auth.GenerateJWTToken(payload)
 
 			if err != nil {
 				loggers.HandleResponse(ctx, http.StatusInternalServerError, err)
 				return
 			}
 
-			loggers.HandleResponse(ctx, http.StatusOK, gin.H{
-				"token": tokenString,
-			})
+			loggers.HandleResponse(ctx, http.StatusOK, tokenString)
 		} else {
 			loggers.HandleResponse(ctx, http.StatusForbidden, gin.H{
 				"message": "User does not exist",

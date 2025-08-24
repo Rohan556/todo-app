@@ -41,14 +41,21 @@ func CreateUser(client *database.Database) gin.HandlerFunc {
 
 		requestBody.Password = encryptedPassword
 
-		_, err = services.CreateUser(ctx, client, requestBody)
+		insertResult, err := services.CreateUser(ctx, client, requestBody)
 
 		if err != nil {
 			loggers.HandleResponse(ctx, http.StatusInternalServerError, err)
 			return
 		}
 
-		tokenString, err := auth.GenerateJWTToken(requestBody.Email)
+		userId := fmt.Sprintf("%v", insertResult.InsertedID)
+
+		payload := schema.JWTRequiredFields{
+			Email:  requestBody.Email,
+			UserId: userId,
+		}
+
+		tokenString, err := auth.GenerateJWTToken(payload)
 
 		if err != nil {
 			fmt.Println(err)
@@ -56,8 +63,6 @@ func CreateUser(client *database.Database) gin.HandlerFunc {
 			return
 		}
 
-		loggers.HandleResponse(ctx, http.StatusCreated, gin.H{
-			"token": tokenString,
-		})
+		loggers.HandleResponse(ctx, http.StatusCreated, tokenString)
 	}
 }

@@ -6,19 +6,21 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/rohan/go-todo/internal/schema"
 )
 
 type TokenInput struct {
 	Email string
 }
 
-func GenerateJWTToken(email string) (string, error) {
+func GenerateJWTToken(payload schema.JWTRequiredFields) (string, error) {
 	secretKey := os.Getenv("JWT_SECRET")
 
 	fmt.Println(secretKey, "secret")
 
 	claims := jwt.MapClaims{
-		"sub": email,
+		"sub": payload.Email,
+		"userId": payload.UserId,
 		"iss": "todo-app",
 		"exp": time.Now().Add(time.Hour).Unix(),
 		"iat": time.Now().Unix(),

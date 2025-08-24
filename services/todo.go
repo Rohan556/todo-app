@@ -17,11 +17,24 @@ const (
 func GetTodos(ctx *gin.Context, client *database.Database) (*mongo.Cursor, error) {
 	collection := helper.ConnectToMongoDBCollection(client, Databasename, CollectionName)
 
-	return collection.Find(ctx, bson.M{})
+	userID, err := helper.GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return collection.Find(ctx, bson.M{
+		"userId": userID,
+	})
 }
 
 func AddTodo(ctx *gin.Context, client *database.Database, requestBody schema.CreateToDoRequestBody) (*mongo.InsertOneResult, error) {
 	collection := helper.ConnectToMongoDBCollection(client, Databasename, CollectionName)
 
 	return collection.InsertOne(ctx, requestBody)
+}
+
+func DeleteTodo(ctx *gin.Context, client *database.Database, requestBody schema.DeleteTodoRequestBody) (*mongo.DeleteResult, error) {
+	collection := helper.ConnectToMongoDBCollection(client, Databasename, CollectionName)
+
+	return collection.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": requestBody.ID}})
 }
