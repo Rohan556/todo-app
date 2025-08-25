@@ -70,6 +70,39 @@ func AddTodo(client *database.Database) gin.HandlerFunc {
 	}
 }
 
+func UpdateTodo(client *database.Database) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var requestBody schema.UpdateTodoRequestBody
+
+		// Check if completed field exists in the request
+		if ctx.Request.Method == "PUT" {
+			rawData, err := ctx.GetRawData()
+			if err == nil {
+				requestBody.CompletedSet = helper.JSONHasKey(rawData, "completed")
+			}
+			// Restore the request body for BindJSON
+			ctx.Request.Body = helper.CreateReadCloser(rawData)
+		}
+
+		ctx.BindJSON(&requestBody)
+
+		validationSuccess := loggers.ValidateRequestBody(ctx, requestBody)
+
+		if !validationSuccess {
+			return
+		}
+
+		result, err := services.UpdateTodo(ctx, client, requestBody)
+
+		if err != nil {
+			loggers.HandleResponse(ctx, http.StatusInternalServerError, err)
+			return
+		}
+
+		loggers.HandleResponse(ctx, http.StatusOK, result)
+	}
+}
+
 func DeleteTodo(client *database.Database) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var requestBody schema.DeleteTodoRequestBody

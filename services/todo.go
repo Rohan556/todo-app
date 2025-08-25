@@ -38,3 +38,19 @@ func DeleteTodo(ctx *gin.Context, client *database.Database, requestBody schema.
 
 	return collection.DeleteMany(ctx, bson.M{"_id": bson.M{"$in": requestBody.ID}})
 }
+
+func UpdateTodo(ctx *gin.Context, client *database.Database, requestBody schema.UpdateTodoRequestBody) (*mongo.UpdateResult, error) {
+	collection := helper.ConnectToMongoDBCollection(client, Databasename, CollectionName)
+
+	update := bson.M{}
+
+	if requestBody.Title != "" {
+		update["title"] = requestBody.Title
+	}
+
+	if requestBody.CompletedSet {
+		update["completed"] = requestBody.Completed
+	}
+
+	return collection.UpdateOne(ctx, bson.M{"_id": requestBody.ID}, bson.M{"$set": update})
+}

@@ -52,6 +52,7 @@ func main() {
 		protected.GET(routes.TODO_URL, controllers.GetAllTodos(&databaseClient))
 		protected.POST(routes.TODO_URL, controllers.AddTodo(&databaseClient))
 		protected.DELETE(routes.TODO_URL, controllers.DeleteTodo(&databaseClient))
+		protected.PUT(routes.TODO_URL, controllers.UpdateTodo(&databaseClient))
 	}
 
 	server.Run(":" + PORT)

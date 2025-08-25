@@ -17,3 +17,10 @@ type Todo struct {
 type DeleteTodoRequestBody struct {
 	ID []bson.ObjectID `json:"id"`
 }
+
+type UpdateTodoRequestBody struct {
+	ID           bson.ObjectID `json:"id" bson:"_id" validate:"required"`
+	Completed    bool          `json:"completed,omitempty" bson:"completed,omitempty"`
+	Title        string        `json:"title,omitempty" bson:"title,omitempty"`
+	CompletedSet bool          `json:"-"`
+}
